@@ -12,12 +12,11 @@ AM2301 → emisor (T3 V1.6.1) ──LoRa 915 MHz──► receptor ──HTTP PO
 
 ## Aplicación web en producción
 
-**Aplicación pendiente de despliegue.** Falta autenticar Firebase CLI en esta máquina
-(`firebase login`) y, para la API pública, habilitar facturación (Cloud Run). Comandos exactos en
-[docs/despliegue.md](docs/despliegue.md). Cuando exista, la URL real se escribe aquí y en
-`frontend/public/config.json` (campo `urlDespliegue`); el dashboard la muestra en «Aplicación web desplegada».
+**https://esp32-8aa66.web.app** (Firebase Hosting, proyecto `esp32-8aa66`; verificado: HTTP 200 y carga con estado «API conectada»).
+Lee Firestore directamente (solo lectura). Actualmente la colección `lecturas` está **vacía**: no hay datos reales hasta que los ESP32
+escriban a través de la API (falta la clave de cuenta de servicio, ver `docs/firebase.md`).
 
-URL pública de la API: **pendiente de despliegue**.
+URL pública de la API: **no existe** (plan Spark sin Cloud Run). La API se ejecuta en un PC de la red del laboratorio.
 
 ## Estado (verificado en este entorno)
 
@@ -26,8 +25,8 @@ URL pública de la API: **pendiente de despliegue**.
 | Firmware emisor | Compila (esp32 core 2.0.12). **Sin probar en hardware.** |
 | Firmware receptor | Compila (esp32 core 2.0.12). **Sin probar en hardware.** |
 | API REST | 30 pruebas pytest OK (memoria y Firestore **simulado**). Firestore real: **no probado** (sin credenciales). |
-| Dashboard | 14 pruebas Vitest OK, build de producción OK. Datos reales: **no verificado** (sin API desplegada). |
-| Despliegue / GitHub | Ver arriba y [docs/pruebas.md](docs/pruebas.md). |
+| Dashboard | 18 pruebas Vitest OK, build OK, **desplegado** y consultando Firestore real (vacío). |
+| Firestore | Base creada, reglas e índice **desplegados**; verificado: lectura de `lecturas` 200, escritura sin credenciales 403, otra colección 403. |
 
 Detalle de requisitos: [docs/matriz_requisitos.md](docs/matriz_requisitos.md). Pruebas físicas pendientes: [docs/pruebas.md](docs/pruebas.md).
 Arquitectura y contrato de datos: [docs/arquitectura.md](docs/arquitectura.md).

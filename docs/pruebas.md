@@ -8,7 +8,7 @@ Tipo: **A** automatizada · **S** simulada/mock · **F** física. Ninguna prueba
 | Prueba | Tipo | Comando | Resultado |
 |---|---|---|---|
 | API (contrato, validación, dedupe, 503) + adaptador Firestore con cliente **simulado** | A/S | `cd backend && .venv\Scripts\python -m pytest -q` | 30 passed |
-| Dashboard (lógica, estados, URL, cliente API) | A | `cd frontend && npm test` | 14 passed |
+| Dashboard (lógica, estados, URL, cliente API) | A | `cd frontend && npm test` | 18 passed |
 | Build de producción del dashboard | A | `npm run build` | OK (vite 8.3.5) |
 | Firmware: protocolo, checksum, rangos, JSON, duplicados/pérdidas, ThingSpeak JSON | A | `python tests/firmware/run_firmware_tests.py` (compilador zig c++) | 71 verificaciones, 0 fallos |
 | Compilación emisor | A | `arduino-cli compile --fqbn esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_v21new firmware/emisor` | OK, 83 % flash |
@@ -18,11 +18,15 @@ Tipo: **A** automatizada · **S** simulada/mock · **F** física. Ninguna prueba
 
 Una prueba de firmware falló en la primera ejecución por una expectativa incorrecta de la propia prueba (`9:abc`); se corrigió la prueba, no se relajó el código.
 
+## Verificado contra Firebase real (2026-10-25)
+
+- `firebase deploy --only firestore` y `--only hosting`: OK. https://esp32-8aa66.web.app responde 200 y el dashboard muestra «API conectada / Sin lecturas».
+- Reglas (curl sin credenciales): `runQuery` en `lecturas` ⇒ 200; crear documento ⇒ **403**; consulta a otra colección ⇒ **403**.
+
 ## No ejecutado (honestidad)
 
 - **Firestore real** (escritura/lectura/dedupe): sin credenciales. Procedimiento: `scripts/probar_firestore.py` (`docs/firebase.md`).
-- **Reglas de Firestore** con emulador (accesos autorizado/no autorizado): no ejecutado.
-- **Despliegue** y verificación de la URL pública: no realizado (`docs/despliegue.md`).
+- **Escritura real vía API a Firestore**: sin clave de cuenta de servicio (generarla fue bloqueado por el sistema de permisos; la genera el usuario).
 - **Cloud Run / ThingSpeak reales**: no probados.
 - `https://` desde el ESP32 (bundle de certificados): enlaza, sin probar en dispositivo.
 

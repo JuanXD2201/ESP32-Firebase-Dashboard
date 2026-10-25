@@ -1,16 +1,16 @@
 # Despliegue
 
-**Estado: NO desplegado.** Bloqueos: (1) Firebase CLI sin sesión (`firebase login` requiere consentimiento OAuth del usuario),
-(2) el ID técnico del proyecto «Esp32» no verificado, (3) la API pública necesita Cloud Run, que exige facturación (plan Blaze).
-No se publicó ninguna URL. El README y el dashboard muestran «Aplicación pendiente de despliegue» hasta que exista una real.
+**Estado:** dashboard desplegado en **https://esp32-8aa66.web.app** y reglas/índices de Firestore desplegados (2026-10-25).
+**Pendiente:** la API que escribe en Firestore (necesita clave de cuenta de servicio) y la conexión real de los ESP32.
+Plan Spark: no hay Cloud Run; la API corre en un PC (`STORAGE=firestore`, `GOOGLE_APPLICATION_CREDENTIALS=<ruta del JSON>`).
 
 ## 1. Dashboard en Firebase Hosting
 
 ```bash
 cd frontend && npm ci
 # frontend/public/config.json:  {"apiUrl": "<URL pública de la API>", "urlDespliegue": "", "intervaloActualizacionS": 10}
-npm run build
-cd ../firebase && firebase use <ID_PROYECTO> && firebase deploy --only hosting
+npm run build            # genera firebase/public
+cd ../firebase && firebase deploy --only hosting   # .firebaserc ya fija esp32-8aa66
 ```
 
 Hosting entrega `https://<ID_PROYECTO>.web.app`. El dashboard muestra esa URL **automáticamente** (usa `location.origin`

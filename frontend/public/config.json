@@ -1,6 +1,6 @@
 {
   "apiUrl": "",
   "firestoreProjectId": "esp32-8aa66",
-  "urlDespliegue": "",
+  "urlDespliegue": "https://esp32-8aa66.web.app",
   "intervaloActualizacionS": 10
 }

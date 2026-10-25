@@ -6,7 +6,7 @@ Vite + JavaScript sin framework. Consulta la API definida en `public/config.json
 {"apiUrl": "https://<api>", "urlDespliegue": "", "intervaloActualizacionS": 10}
 ```
 
-`npm ci` · `npm run dev` · `npm test` · `npm run build` (salida en `dist/`, desplegada por `firebase/firebase.json`).
+`npm ci` · `npm run dev` · `npm test` · `npm run build` (salida en `firebase/public/`, desplegada por `firebase/firebase.json`).
 
 - Sin `apiUrl` y sin demo: aviso de configuración (no se inventan datos).
 - Modo demostración (`?demo=1` o botón): datos ficticios con nodo `DEMO`, aviso amarillo visible.
