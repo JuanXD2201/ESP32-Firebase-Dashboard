@@ -49,7 +49,7 @@ docs/                                arquitectura, instalación, hardware, API, 
 Requisitos: Git, Python 3.12+, Node 20.19+/22.12+, [Arduino CLI](https://arduino.github.io/arduino-cli/) (solo firmware).
 
 ```powershell
-git clone <URL-del-repositorio> ; cd ESP32-Firebase-Dashboard
+git clone https://github.com/JuanXD2201/ESP32-Firebase-Dashboard ; cd ESP32-Firebase-Dashboard
 .\scripts\instalar.ps1            # Linux/macOS: ./scripts/instalar.sh
 .\scripts\probar.ps1              # pruebas automatizadas
 cd backend ; .\.venv\Scripts\python -m app          # API en :5000 (STORAGE=memoria por defecto)
