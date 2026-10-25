@@ -23,10 +23,11 @@ Una prueba de firmware falló en la primera ejecución por una expectativa incor
 - `firebase deploy --only firestore` y `--only hosting`: OK. https://esp32-8aa66.web.app responde 200 y el dashboard muestra «API conectada / Sin lecturas».
 - Reglas (curl sin credenciales): `runQuery` en `lecturas` ⇒ 200; crear documento ⇒ **403**; consulta a otra colección ⇒ **403**.
 
+- Con la clave de cuenta de servicio (guardada fuera del repo): `scripts/probar_firestore.py` ⇒ OK (escritura, deduplicación `AlreadyExists`, consulta, borrado).
+- API real (`STORAGE=firestore`, `X-API-Key`): POST sin clave ⇒ 401; `simular_receptor.py` (6 POST) ⇒ 201; el dashboard publicado mostró esas lecturas (marcadas SIMULADAS) con «Datos recientes». Luego se borraron (colección vacía de nuevo). **Son datos simulados, no hardware.**
+
 ## No ejecutado (honestidad)
 
-- **Firestore real** (escritura/lectura/dedupe): sin credenciales. Procedimiento: `scripts/probar_firestore.py` (`docs/firebase.md`).
-- **Escritura real vía API a Firestore**: sin clave de cuenta de servicio (generarla fue bloqueado por el sistema de permisos; la genera el usuario).
 - **Cloud Run / ThingSpeak reales**: no probados.
 - `https://` desde el ESP32 (bundle de certificados): enlaza, sin probar en dispositivo.
 

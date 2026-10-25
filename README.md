@@ -13,8 +13,8 @@ AM2301 → emisor (T3 V1.6.1) ──LoRa 915 MHz──► receptor ──HTTP PO
 ## Aplicación web en producción
 
 **https://esp32-8aa66.web.app** (Firebase Hosting, proyecto `esp32-8aa66`; verificado: HTTP 200 y carga con estado «API conectada»).
-Lee Firestore directamente (solo lectura). Actualmente la colección `lecturas` está **vacía**: no hay datos reales hasta que los ESP32
-escriban a través de la API (falta la clave de cuenta de servicio, ver `docs/firebase.md`).
+Lee Firestore directamente (solo lectura). Verificado de extremo a extremo con lecturas **simuladas** (API → Firestore → dashboard); luego se borraron.
+La colección `lecturas` está vacía hasta que los ESP32 escriban a través de la API (ver `docs/firebase.md`).
 
 URL pública de la API: **no existe** (plan Spark sin Cloud Run). La API se ejecuta en un PC de la red del laboratorio.
 
@@ -24,7 +24,7 @@ URL pública de la API: **no existe** (plan Spark sin Cloud Run). La API se ejec
 |---|---|
 | Firmware emisor | Compila (esp32 core 2.0.12). **Sin probar en hardware.** |
 | Firmware receptor | Compila (esp32 core 2.0.12). **Sin probar en hardware.** |
-| API REST | 30 pruebas pytest OK (memoria y Firestore **simulado**). Firestore real: **no probado** (sin credenciales). |
+| API REST | 30 pruebas pytest OK (memoria y Firestore **simulado**). Probada contra Firestore real (`scripts/probar_firestore.py` y POST reales). |
 | Dashboard | 18 pruebas Vitest OK, build OK, **desplegado** y consultando Firestore real (vacío). |
 | Firestore | Base creada, reglas e índice **desplegados**; verificado: lectura de `lecturas` 200, escritura sin credenciales 403, otra colección 403. |
 
