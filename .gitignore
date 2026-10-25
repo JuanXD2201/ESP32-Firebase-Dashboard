@@ -1,0 +1,40 @@
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+serviceAccountKey*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+credentials*.json
+.firebase/
+firebase-debug*.log
+ui-debug.log
+
+# Volcados de memoria / copias de flash (contienen redes Wi-Fi y claves)
+*.bin
+flash_com*.bin
+respaldos_flash/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# Arduino / compilaciones
+build/
+*.elf
+*.map
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

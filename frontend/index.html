@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Monitor ESP32 LoRa</title>
+    <meta name="description" content="Dashboard de temperatura y humedad recibidas por LoRa y almacenadas en Firestore." />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Monitor ESP32 · LoRa</h1>
+        <p class="subtitulo">Sensor AM2301 → emisor → LoRa 915 MHz → receptor → API → Firestore</p>
+      </div>
+      <div class="estados" role="status" aria-live="polite">
+        <span id="pill-conexion" class="pill cargando">Cargando…</span>
+        <span id="pill-datos" class="pill vacio">Sin lecturas</span>
+      </div>
+    </header>
+
+    <div id="aviso-demo" class="aviso aviso-demo" hidden>
+      MODO DEMOSTRACIÓN: los valores mostrados son ficticios, no provienen del sensor.
+    </div>
+    <div id="aviso-error" class="aviso aviso-error" hidden role="alert"></div>
+    <div id="aviso-config" class="aviso aviso-config" hidden>
+      No hay API configurada. Edita <code>config.json</code> (campo <code>apiUrl</code>) o activa el modo demostración.
+    </div>
+
+    <main>
+      <section class="controles" aria-label="Filtros">
+        <label>Nodo
+          <select id="filtro-nodo"><option value="">Todos</option></select>
+        </label>
+        <label>Periodo
+          <select id="filtro-horas">
+            <option value="1">Última hora</option>
+            <option value="6">Últimas 6 h</option>
+            <option value="24" selected>Últimas 24 h</option>
+            <option value="168">Últimos 7 días</option>
+            <option value="0">Todo</option>
+          </select>
+        </label>
+        <label>Registros
+          <select id="filtro-limite">
+            <option>25</option><option selected>50</option><option>100</option><option>200</option>
+          </select>
+        </label>
+        <button id="btn-actualizar" type="button">Actualizar ahora</button>
+        <button id="btn-demo" type="button" class="secundario" aria-pressed="false">Modo demostración</button>
+      </section>
+
+      <section class="tarjetas" aria-label="Última lectura">
+        <article class="tarjeta"><h2>Temperatura</h2><p class="valor"><span id="v-temp">—</span><small>°C</small></p></article>
+        <article class="tarjeta"><h2>Humedad</h2><p class="valor"><span id="v-hum">—</span><small>%</small></p></article>
+        <article class="tarjeta"><h2>Bombillo</h2><p class="valor"><span id="v-bombillo" class="insignia">—</span></p></article>
+        <article class="tarjeta"><h2>Nodo · Secuencia</h2><p class="valor texto"><span id="v-nodo">—</span> <small>#<span id="v-seq">—</span></small></p></article>
+        <article class="tarjeta ancha"><h2>Última lectura</h2><p class="valor texto"><span id="v-fecha">—</span> <small id="v-edad"></small></p><p id="v-simulado" class="nota" hidden>Valores SIMULADOS por el emisor (no son mediciones).</p></article>
+        <article class="tarjeta"><h2>RSSI · SNR</h2><p class="valor texto"><span id="v-rssi">—</span> <small>dBm</small> · <span id="v-snr">—</span> <small>dB</small></p></article>
+      </section>
+
+      <section class="panel" aria-label="Historial gráfico">
+        <h2>Historial</h2>
+        <div id="grafico" class="grafico" role="img" aria-label="Gráfico de temperatura y humedad"></div>
+        <p class="leyenda"><span class="punto temp"></span> Temperatura (°C) <span class="punto hum"></span> Humedad (%)</p>
+      </section>
+
+      <section class="panel" aria-label="Tabla de lecturas">
+        <h2>Lecturas recibidas <small id="contador"></small></h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Nodo</th><th>Seq</th><th>Temp. °C</th><th>Hum. %</th><th>Bombillo</th><th>RSSI</th><th>SNR</th></tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+          </table>
+        </div>
+        <p id="vacio" class="vacio-texto" hidden>Aún no hay lecturas para este filtro.</p>
+      </section>
+
+      <section class="panel" aria-label="Estado del sistema">
+        <h2>Estado del sistema</h2>
+        <dl class="sistema">
+          <dt>API</dt><dd id="s-api">—</dd>
+          <dt>Almacenamiento</dt><dd id="s-almacen">—</dd>
+          <dt>Escritura protegida</dt><dd id="s-auth">—</dd>
+          <dt>Última consulta</dt><dd id="s-consulta">—</dd>
+          <dt>Actualización</dt><dd id="s-intervalo">—</dd>
+        </dl>
+        <div id="despliegue" class="despliegue">
+          <h3>Aplicación web desplegada</h3>
+          <p id="despliegue-contenido">Aplicación pendiente de despliegue</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Proyecto académico · Seminario en TIC · <span id="pie-url"></span></p>
+    </footer>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Modelo de acceso:
+//  - TODO el acceso de clientes (navegador, móvil, ESP32) a Firestore está denegado.
+//  - Las lecturas se escriben y consultan únicamente desde la API (Firebase Admin SDK con
+//    cuenta de servicio), que ignora estas reglas y aplica su propia validación.
+//  - El dashboard consulta la API, no Firestore directamente.
+// Si en el futuro un cliente necesita leer directamente, concede lectura SOLO de `lecturas`
+// a usuarios autenticados y mantén `allow write: if false`.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}
