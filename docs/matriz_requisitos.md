@@ -32,7 +32,7 @@ Notas: la guía señala que sus pruebas «deben funcionar en conjunto en un mism
 | E3 | API: `/health`, `POST /api/lecturas`, `GET /api/lecturas`, `GET /api/lecturas/ultima` | `backend/app/__init__.py` | `backend/tests/test_api.py` (30 pruebas) | Implementado · Probado SW |
 | E3 | No devuelve éxito si el almacenamiento falla | `crear_lectura` → 503 | `test_fallo_de_almacenamiento_no_devuelve_exito` | Probado SW |
 | E4 | Estructura Firestore, reglas, integración real | `backend/app/storage.py`, `firebase/*` | `test_firestore_storage.py` (cliente **simulado**) | Implementado · **Bloqueado** (real): sin `firebase login`/credenciales |
-| E4 | Reglas sin acceso público | `firebase/firestore.rules` (todo denegado a clientes) | Verificación con emulador **no ejecutada** | Implementado · Pendiente verificación |
+| E4 | Reglas sin acceso público indiscriminado | `firebase/firestore.rules` (lectura solo de `lecturas`, escritura denegada) | Verificación con emulador **no ejecutada** | Implementado · Pendiente verificación |
 | E5 | Dashboard con estados de carga/vacío/error, historial, filtros, estado del sistema | `frontend/src/*` | `frontend/tests/logica.test.js` (14), `vite build` | Implementado · Probado SW · Datos reales no verificados |
 | E5 | URL pública en la interfaz y README | `main.js::pintarDespliegue`, `README.md` | Prueba de `resolverUrlDespliegue` | Implementado · **Bloqueado**: sin despliegue, muestra «pendiente de despliegue» |
 | E6 | Diagrama y contratos documentados | `docs/arquitectura.md` | — | Implementado |

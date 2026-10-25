@@ -1,7 +1,9 @@
 # Firebase y Firestore
 
-Proyecto académico indicado: **«Esp32»**. Su **ID técnico no se pudo verificar** en este entorno (Firebase CLI sin sesión);
-cópialo de la consola: Configuración del proyecto → ID del proyecto, y úsalo abajo como `<ID_PROYECTO>`.
+Proyecto: **«Esp32»**, ID técnico **`esp32-8aa66`** (verificado en la consola, plan Spark). `firebase/.firebaserc` ya lo fija.
+Plan Spark ⇒ sin Cloud Run: el dashboard desplegado en Hosting **lee Firestore directamente** (REST, solo lectura) y las escrituras
+las hace la API ejecutada en un PC con cuenta de servicio.
+Estado de la base: la creación de la base `(default)` se inició en la consola; **falta elegir la ubicación** (irreversible) y confirmar.
 
 ## Modelo de datos
 
@@ -13,8 +15,10 @@ Campos: `nodo` string · `seq` int · `temperatura` double · `humedad` double �
 
 ## Seguridad
 
-`firebase/firestore.rules` deniega todo a clientes. La API usa Admin SDK (ignora reglas) con una **cuenta de servicio**.
-El ESP32 y el navegador nunca reciben credenciales de Firebase.
+`firebase/firestore.rules`: **lectura pública solo de `lecturas`** (límite 500 por consulta), **escritura denegada a todos los clientes**,
+todo lo demás denegado. Decisión consciente por el plan Spark: no pongas datos sensibles en `lecturas`.
+La API usa Admin SDK (ignora reglas) con una **cuenta de servicio**. El ESP32 y el navegador nunca reciben credenciales de Firebase.
+Las consultas del dashboard con filtro de nodo necesitan el índice compuesto de `firestore.indexes.json` (se despliega con `firebase deploy --only firestore`).
 Verificación de reglas con emulador: **pendiente** (`firebase emulators:exec --only firestore` + pruebas de acceso denegado).
 
 ## Puesta en marcha (requiere tu cuenta)

@@ -62,7 +62,7 @@ Guía completa: [docs/instalacion.md](docs/instalacion.md).
 ## Seguridad
 
 Sin credenciales en el repositorio. `.env`, claves de cuenta de servicio y `*.bin` están en `.gitignore`.
-Firestore deniega todo acceso de clientes; solo la API (Admin SDK) lee/escribe. El ESP32 no lleva credenciales
+Firestore (`esp32-8aa66`): clientes solo pueden **leer** `lecturas` (el dashboard); toda escritura pasa por la API (Admin SDK). El ESP32 no lleva credenciales
 administrativas; la clave `X-API-Key` y la de ThingSpeak se guardan en NVS por comandos serie, no en el código.
 **No publiques `flash_com3.bin` / `flash_com4.bin`**: contienen redes Wi-Fi y contraseñas antiguas.
 

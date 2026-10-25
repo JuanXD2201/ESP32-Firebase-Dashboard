@@ -1,15 +1,20 @@
 rules_version = '2';
 
-// Modelo de acceso:
-//  - TODO el acceso de clientes (navegador, móvil, ESP32) a Firestore está denegado.
-//  - Las lecturas se escriben y consultan únicamente desde la API (Firebase Admin SDK con
-//    cuenta de servicio), que ignora estas reglas y aplica su propia validación.
-//  - El dashboard consulta la API, no Firestore directamente.
-// Si en el futuro un cliente necesita leer directamente, concede lectura SOLO de `lecturas`
-// a usuarios autenticados y mantén `allow write: if false`.
+// Modelo de acceso (proyecto Firebase «Esp32», plan Spark: sin Cloud Run, el dashboard lee directo):
+//  - ESCRITURA: denegada a todos los clientes. Solo la API (Admin SDK + cuenta de servicio) escribe;
+//    el Admin SDK ignora estas reglas. El ESP32 nunca recibe credenciales de Firebase.
+//  - LECTURA: pública y SOLO de la colección `lecturas` (temperatura, humedad, estado del bombillo,
+//    RSSI/SNR). Es una decisión consciente para que el dashboard funcione sin backend público:
+//    no guardes datos sensibles ahí. Las consultas se limitan a 500 documentos.
+//  - Cualquier otra colección: denegada.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{documento=**} {
+    match /lecturas/{lectura} {
+      allow get: if true;
+      allow list: if request.query.limit <= 500;
+      allow create, update, delete: if false;
+    }
+    match /{otro=**} {
       allow read, write: if false;
     }
   }

@@ -1,4 +1,5 @@
 import { crearCliente } from "./api.js";
+import { crearClienteFirestore } from "./firestore.js";
 import { dibujarGrafico } from "./grafico.js";
 import {
   antiguedadSegundos,
@@ -32,7 +33,16 @@ async function cargarConfig() {
   } catch {
     /* sin config.json: se queda con los valores por defecto */
   }
+  // apiUrl explícita tiene prioridad; si no, lectura directa de Firestore (solo lectura, ver reglas).
   if (estado.config.apiUrl) estado.cliente = crearCliente(estado.config.apiUrl);
+  else if (estado.config.firestoreProjectId) {
+    estado.cliente = crearClienteFirestore(estado.config.firestoreProjectId);
+  }
+}
+
+function descripcionFuente() {
+  if (estado.config.apiUrl) return estado.config.apiUrl;
+  return `Firestore · ${estado.config.firestoreProjectId}`;
 }
 
 function filtros() {
@@ -126,7 +136,7 @@ function pintar() {
   $("s-api").textContent = estado.demo
     ? "Modo demostración"
     : estado.cliente
-      ? `${estado.config.apiUrl} — ${estado.apiOk ? "responde" : estado.apiOk === false ? "sin respuesta" : "…"}`
+      ? `${descripcionFuente()} — ${estado.apiOk ? "responde" : estado.apiOk === false ? "sin respuesta" : "…"}`
       : "No configurada";
   $("s-almacen").textContent = estado.health?.almacenamiento ?? "—";
   $("s-auth").textContent = estado.health ? (estado.health.autenticacion_escritura ? "sí (X-API-Key)" : "NO: la API acepta escrituras sin clave") : "—";
