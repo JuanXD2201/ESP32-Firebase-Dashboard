@@ -8,10 +8,10 @@ from flask_cors import CORS
 
 from .config import cargar_config
 from .storage import StorageError, crear_almacenamiento
-from .validation import clave_deduplicacion, validar_lectura
+from .validation import clave_deduplicacion, validar_lectura, validar_mensaje
 
 
-def create_app(overrides=None, storage=None):
+def create_app(overrides=None, storage=None, storage_mensajes=None):
     config = cargar_config(overrides)
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = 4096  # una lectura pesa < 300 bytes
@@ -21,6 +21,9 @@ def create_app(overrides=None, storage=None):
     CORS(app, origins=origenes or "*")
 
     db = storage or crear_almacenamiento(config)
+    db_mensajes = storage_mensajes or crear_almacenamiento(
+        config, config["FIRESTORE_COLLECTION_MENSAJES"]
+    )
 
     def autorizado():
         clave = config["API_KEY"]
@@ -94,6 +97,31 @@ def create_app(overrides=None, storage=None):
         if not resultado:
             return jsonify(error="No hay lecturas"), 404
         return jsonify(resultado[0])
+
+    @app.post("/api/mensajes")
+    def crear_mensaje():
+        if not autorizado():
+            return jsonify(error="API key inválida o ausente"), 401
+        mensaje, errores = validar_mensaje(request.get_json(silent=True))
+        if errores:
+            return jsonify(error="Datos inválidos", detalles=errores), 400
+        try:
+            doc_id, _ = db_mensajes.guardar(mensaje)
+        except StorageError:
+            app.logger.exception("Fallo de almacenamiento")
+            return jsonify(error="Almacenamiento no disponible"), 503
+        return jsonify(id=doc_id, guardado=mensaje), 201
+
+    @app.get("/api/mensajes")
+    def listar_mensajes():
+        limite, err = parametro_entero("limit", 50, 1, config["MAX_LIMIT"])
+        if err:
+            return jsonify(error="Parámetros inválidos", detalles=[err]), 400
+        try:
+            return jsonify(db_mensajes.listar(limite, request.args.get("nodo")))
+        except StorageError:
+            app.logger.exception("Fallo de consulta")
+            return jsonify(error="Almacenamiento no disponible"), 503
 
     @app.get("/api/nodos")
     def listar_nodos():

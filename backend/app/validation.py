@@ -92,3 +92,33 @@ def clave_deduplicacion(lectura):
     if "sesion" not in lectura:
         return None
     return f"{lectura['nodo']}_{lectura['sesion']}_{lectura['seq']}"
+
+
+def validar_mensaje(datos):
+    """Mensaje recibido por BLE en el receptor. Devuelve (mensaje_limpio, errores).
+
+    nodo   str  sí  identificador del receptor (mismas reglas que en una lectura)
+    texto  str  sí  1-100 caracteres; los caracteres de control se rechazan
+    """
+    if not isinstance(datos, dict):
+        return None, ["El cuerpo debe ser un objeto JSON"]
+    errores = []
+    nodo, error = (None, "Falta el campo 'nodo'")
+    if datos.get("nodo") is not None:
+        nodo, error = _convertir("nodo", str, datos["nodo"])
+    if error:
+        errores.append(error)
+    texto = datos.get("texto")
+    if texto is None:
+        errores.append("Falta el campo 'texto'")
+    elif not isinstance(texto, str) or not texto.strip():
+        errores.append("'texto' debe ser texto no vacío")
+    else:
+        texto = texto.strip()
+        if len(texto) > 100:
+            errores.append("'texto' fuera de rango (máx 100 caracteres)")
+        elif any(ord(c) < 32 or ord(c) == 127 for c in texto):
+            errores.append("'texto' no admite caracteres de control")
+    if errores:
+        return None, errores
+    return {"nodo": nodo, "texto": texto, "origen": "ble"}, []

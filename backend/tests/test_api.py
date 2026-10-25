@@ -171,3 +171,47 @@ def test_fallo_de_almacenamiento_no_devuelve_exito():
     assert c.get("/api/lecturas").status_code == 503
     assert c.get("/api/lecturas/ultima").status_code == 503
     assert c.get("/api/nodos").status_code == 503
+
+
+# ---- mensajes BLE (reemplazan a ThingSpeak: el dashboard los muestra) ----
+MENSAJE = {"nodo": "receptor-01", "texto": "hola desde el celular"}
+
+
+def test_mensaje_valido_y_listado(cliente):
+    r = cliente.post("/api/mensajes", json=MENSAJE)
+    assert r.status_code == 201
+    assert r.json["guardado"] == {**MENSAJE, "origen": "ble"}
+    cliente.post("/api/mensajes", json={**MENSAJE, "texto": "segundo"})
+    lista = cliente.get("/api/mensajes?limit=5").json
+    assert [m["texto"] for m in lista] == ["segundo", "hola desde el celular"]
+    # los mensajes no se mezclan con las lecturas
+    assert cliente.get("/api/lecturas").json == []
+
+
+@pytest.mark.parametrize(
+    "cuerpo",
+    [
+        {"texto": "sin nodo"},
+        {"nodo": "r"},
+        {"nodo": "r", "texto": "   "},
+        {"nodo": "r", "texto": "x" * 101},
+        {"nodo": "r", "texto": "con\ncontrol"},
+        {"nodo": "r", "texto": 5},
+        {"nodo": "mal nodo", "texto": "x"},
+    ],
+)
+def test_mensaje_invalido(cliente, cuerpo):
+    assert cliente.post("/api/mensajes", json=cuerpo).status_code == 400
+
+
+def test_mensaje_exige_api_key(cliente_con_clave):
+    assert cliente_con_clave.post("/api/mensajes", json=MENSAJE).status_code == 401
+    ok = cliente_con_clave.post("/api/mensajes", json=MENSAJE, headers={"X-API-Key": "secreta"})
+    assert ok.status_code == 201
+
+
+def test_mensajes_fallo_de_almacenamiento():
+    app = create_app({"STORAGE": "memoria", "API_KEY": ""}, storage_mensajes=AlmacenFallido())
+    c = app.test_client()
+    assert c.post("/api/mensajes", json=MENSAJE).status_code == 503
+    assert c.get("/api/mensajes").status_code == 503

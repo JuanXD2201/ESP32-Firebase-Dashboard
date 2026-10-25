@@ -1,5 +1,5 @@
 // Pruebas en el PC de la lógica pura del firmware (sin hardware):
-//   protocolo.h (trama LoRa, checksum, JSON), rastreo.h (duplicados/pérdidas), thingspeak.h.
+//   protocolo.h (trama LoRa, checksum, JSON), rastreo.h (duplicados/pérdidas), mensajes.h (BLE → JSON).
 // Ejecutar: python tests/firmware/run_firmware_tests.py
 #include <cstdio>
 #include <cstring>
@@ -7,7 +7,7 @@
 
 #include "../../firmware/receptor/protocolo.h"
 #include "../../firmware/receptor/rastreo.h"
-#include "../../firmware/receptor/thingspeak.h"
+#include "../../firmware/receptor/mensajes.h"
 
 static int fallos = 0;
 static int total = 0;
@@ -184,24 +184,22 @@ static void rastreador_ventana_se_desplaza() {
   VERIFICAR(r.evaluar(l, &perdidos) == RASTREO_DUPLICADO);
 }
 
-static void thingspeak_mensajes_ble() {
+static void mensajes_ble_a_json() {
   char j[300];
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "23.5") > 0);
-  VERIFICAR(strcmp(j, "{\"api_key\":\"ABC123\",\"field1\":23.5}") == 0);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "3:18.2") > 0);
-  VERIFICAR(strcmp(j, "{\"api_key\":\"ABC123\",\"field3\":18.2}") == 0);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "  hola mundo \r\n") > 0);
-  VERIFICAR(strcmp(j, "{\"api_key\":\"ABC123\",\"status\":\"hola mundo\"}") == 0);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "di \"hola\"\\") > 0);
-  VERIFICAR(strcmp(j, "{\"api_key\":\"ABC123\",\"status\":\"di \\\"hola\\\"\\\\\"}") == 0);
-  // Texto que NO es un número JSON válido se envía como estado, nunca como número.
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "nan") > 0 && strstr(j, "status") != nullptr);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "+5") > 0 && strstr(j, "status") != nullptr);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", ".5") > 0 && strstr(j, "status") != nullptr);
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "3:abc") == 0);   // campo válido con valor no numérico
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "9:abc") > 0 && strstr(j, "status") != nullptr);  // 9 no es campo
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "ABC123", "   ") == 0);     // vacío
-  VERIFICAR(tsConstruirJson(j, sizeof(j), "AB\"C", "1") == 0);        // clave con comillas: inyección
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", "hola") > 0);
+  VERIFICAR(strcmp(j, "{\"nodo\":\"receptor-01\",\"texto\":\"hola\"}") == 0);
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", "  hola mundo \r\n") > 0);
+  VERIFICAR(strcmp(j, "{\"nodo\":\"receptor-01\",\"texto\":\"hola mundo\"}") == 0);
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", "di \"hola\"\\") > 0);
+  VERIFICAR(strcmp(j, "{\"nodo\":\"receptor-01\",\"texto\":\"di \\\"hola\\\"\\\\\"}") == 0);
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", "a\nb") > 0 && strstr(j, "a b") != nullptr);  // control -> espacio
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", "   ") == 0);       // vacío
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "mal nodo", "x") == 0);            // nodo inválido
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "r\"x", "x") == 0);                // inyección por el nodo
+  std::string largo(300, 'z');
+  VERIFICAR(msgConstruirJson(j, sizeof(j), "receptor-01", largo.c_str()) > 0);
+  VERIFICAR(strlen(j) == 31 + 100 + 2);                                                // truncado a 100 caracteres
+  VERIFICAR(msgConstruirJson(j, 20, "receptor-01", "hola") == 0);             // no cabe
 }
 
 int main() {
@@ -214,7 +212,7 @@ int main() {
   rastreador_duplicados_y_perdidas();
   rastreador_salto_enorme_no_cuenta_perdidas();
   rastreador_ventana_se_desplaza();
-  thingspeak_mensajes_ble();
+  mensajes_ble_a_json();
   std::printf("%d verificaciones, %d fallos\n", total, fallos);
   return fallos == 0 ? 0 : 1;
 }

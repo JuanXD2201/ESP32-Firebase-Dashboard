@@ -1,14 +1,14 @@
 // receptor.ino - RECEPTOR LoRa + BLE + Wi-Fi (pasarela a la nube) con FreeRTOS
 //
 //   LoRa 915 MHz --> tareaLoRa --(cola)--> tareaRed --HTTP POST--> API (-> Firestore)
-//   Teléfono --BLE--> callback --(cola)--> tareaRed --HTTP POST--> ThingSpeak (guía académica)
+//   Teléfono --BLE--> callback --(cola)--> tareaRed --HTTP POST--> API (-> Firestore) --> dashboard
 //   Serie: tareaSerie (Wi-Fi y ajustes en cualquier momento)   LED: tareaLed (único dueño)
 //
 // Requisitos de la guía "Capa de red en IoT" cubiertos en este mismo código:
 //   1 Wi-Fi por serie en cualquier momento    -> comando "wifi"
 //   2 BLE mostrado por serie                  -> CallbackEscritura
 //   3 LED 3x(250 ms ON/250 ms OFF) al recibir BLE
-//   4 HTTP POST (JSON) a la nube              -> tareaRed (API y ThingSpeak)
+//   4 HTTP POST (JSON) a la nube              -> tareaRed (API /api/lecturas y /api/mensajes)
 //   5 LED 2x(500 ms ON/500 ms OFF) al éxito de la nube
 //   6 FreeRTOS: tareaLoRa (comunicaciones), tareaRed, tareaLed, tareaSerie
 //
@@ -28,7 +28,7 @@
 #include "nube.h"
 #include "protocolo.h"
 #include "rastreo.h"
-#include "thingspeak.h"
+#include "mensajes.h"
 
 // ---------------------------------------------------------------- tipos y estado
 enum LedPatron : uint8_t {
@@ -257,7 +257,6 @@ static bool wifiIntentando = false;
 static uint32_t wifiInicioIntento = 0;
 static uint32_t wifiProximoIntento = 0;
 static uint32_t wifiPausaMs = WIFI_REINTENTO_MIN_MS;
-static uint32_t tsUltimoEnvio = 0;
 
 // Máquina de estados sin esperas: nunca bloquea LoRa ni BLE (otras tareas).
 static void gestionarWifi(const Ajustes& a) {
@@ -301,47 +300,44 @@ static void gestionarWifi(const Ajustes& a) {
 
 static bool codigoExitoso(int codigo) { return codigo == 200 || codigo == 201; }
 
+// URL base configurada (sin "/" final ni el sufijo "/api/lecturas" si el usuario lo pegó) + ruta.
+static void construirUrl(char* salida, size_t n, const char* base, const char* ruta) {
+  char b[160];
+  strncpy(b, base, sizeof(b) - 1);
+  b[sizeof(b) - 1] = 0;
+  size_t len = strlen(b);
+  while (len > 0 && b[len - 1] == '/') b[--len] = 0;
+  const char* sufijo = "/api/lecturas";
+  size_t ls = strlen(sufijo);
+  if (len >= ls && strcmp(b + len - ls, sufijo) == 0) b[len - ls] = 0;
+  snprintf(salida, n, "%s%s", b, ruta);
+}
+
 // Envía un trabajo con reintentos. Devuelve true solo si la nube confirmó la recepción.
 static bool enviarTrabajo(const Trabajo& t, const Ajustes& a) {
   char cuerpo[300];
-  const char* url = nullptr;
-  const char* cabecera = nullptr;
-  const char* clave = nullptr;
-  const char* destino;
+  char url[200];
+  const char* destino = t.tipo == TRABAJO_LECTURA ? "API lecturas" : "API mensajes";
 
+  if (a.apiUrl[0] == 0) {
+    stats.nubeSinConfig++;
+    registrar("[API] sin configurar: usa el comando  api http://<IP-del-PC>:5000");
+    return false;
+  }
   if (t.tipo == TRABAJO_LECTURA) {
-    destino = "API";
-    if (a.apiUrl[0] == 0) {
-      stats.nubeSinConfig++;
-      registrar("[API] sin configurar: usa el comando  api <url>/api/lecturas");
-      return false;
-    }
-    url = a.apiUrl;
-    cabecera = "X-API-Key";
-    clave = a.apiKey;
+    construirUrl(url, sizeof(url), a.apiUrl, "/api/lecturas");
     strncpy(cuerpo, t.datos, sizeof(cuerpo) - 1);
     cuerpo[sizeof(cuerpo) - 1] = 0;
   } else {
-    destino = "ThingSpeak";
-    if (a.tsKey[0] == 0) {
-      stats.nubeSinConfig++;
-      registrar("[THINGSPEAK] sin configurar: usa el comando  ts <WRITE_API_KEY>");
-      return false;
-    }
-    if (tsConstruirJson(cuerpo, sizeof(cuerpo), a.tsKey, t.datos) == 0) {
+    construirUrl(url, sizeof(url), a.apiUrl, "/api/mensajes");
+    if (msgConstruirJson(cuerpo, sizeof(cuerpo), RECEPTOR_ID, t.datos) == 0) {
       stats.nubeError++;
-      registrar("[THINGSPEAK] mensaje no convertible a JSON (usa  valor  o  N:valor  o texto)");
+      registrar("[API] mensaje BLE vacio o no convertible a JSON");
       return false;
-    }
-    url = THINGSPEAK_URL;
-    uint32_t espera = THINGSPEAK_INTERVALO_MIN_MS;
-    uint32_t transcurrido = millis() - tsUltimoEnvio;
-    if (tsUltimoEnvio != 0 && transcurrido < espera) {
-      registrar("[THINGSPEAK] limite de 15 s entre envios: esperando %lu ms",
-                (unsigned long)(espera - transcurrido));
-      vTaskDelay(pdMS_TO_TICKS(espera - transcurrido));
     }
   }
+  const char* cabecera = "X-API-Key";
+  const char* clave = a.apiKey;
 
   for (int intento = 1; intento <= HTTP_REINTENTOS; intento++) {
     if (WiFi.status() != WL_CONNECTED) {
@@ -352,11 +348,8 @@ static bool enviarTrabajo(const Trabajo& t, const Ajustes& a) {
     String respuesta;
     registrar("[%s] POST (intento %d/%d): %.120s", destino, intento, HTTP_REINTENTOS, cuerpo);
     int codigo = nubePostJson(url, cabecera, clave, cuerpo, &respuesta);
-    if (t.tipo == TRABAJO_BLE) tsUltimoEnvio = millis();
 
     bool ok = codigoExitoso(codigo);
-    // ThingSpeak responde 200 con cuerpo "0" cuando rechaza la actualización.
-    if (ok && t.tipo == TRABAJO_BLE && respuesta == "0") ok = false;
     if (ok) {
       stats.nubeOk++;
       registrar("[%s] OK HTTP %d  respuesta=%s", destino, codigo, respuesta.c_str());
@@ -405,8 +398,8 @@ static void imprimirEstado() {
   registrar("[ESTADO] wifi=%s ssid=\"%s\" ip=%s", WiFi.status() == WL_CONNECTED ? "conectado" : "desconectado",
             a.ssid[0] ? a.ssid : "(sin configurar)",
             WiFi.status() == WL_CONNECTED ? WiFi.localIP().toString().c_str() : "-");
-  registrar("[ESTADO] api=%s  apiKey=%s  thingspeak=%s", a.apiUrl[0] ? a.apiUrl : "(sin configurar)",
-            a.apiKey[0] ? "definida" : "no", a.tsKey[0] ? "definida" : "no");
+  registrar("[ESTADO] api=%s  apiKey=%s", a.apiUrl[0] ? a.apiUrl : "(sin configurar)",
+            a.apiKey[0] ? "definida" : "no");
   registrar("[ESTADO] lora: rx=%lu invalidos=%lu duplicados=%lu perdidos=%lu | ble=%lu", (unsigned long)stats.loraRecibidos,
             (unsigned long)stats.loraInvalidos, (unsigned long)stats.loraDuplicados,
             (unsigned long)stats.loraPerdidos, (unsigned long)stats.bleMensajes);
@@ -419,9 +412,8 @@ static void imprimirAyuda() {
   registrar("Comandos (en cualquier momento):");
   registrar("  wifi               pide SSID y luego la clave (la clave se ve al escribirla)");
   registrar("  wifi borrar        elimina las credenciales Wi-Fi guardadas");
-  registrar("  api <url>          URL completa del POST, ej. http://192.168.1.50:5000/api/lecturas");
+  registrar("  api <url>          URL base de la API, ej. http://192.168.1.50:5000");
   registrar("  apikey <clave>     clave X-API-Key de la API (vacia: apikey -)");
-  registrar("  ts <WRITE_KEY>     Write API Key de ThingSpeak (borrar: ts -)");
   registrar("  estado | ayuda | reiniciar");
 }
 
@@ -464,15 +456,6 @@ static void procesarLinea(char* linea, EstadoSerie* estado, char* ssidTemporal) 
   } else if (!strncmp(linea, "apikey ", 7)) {
     ajustesGuardarApiKey(strcmp(linea + 7, "-") ? linea + 7 : "");
     registrar("[API] apiKey actualizada");
-  } else if (!strncmp(linea, "ts ", 3)) {
-    const char* clave = strcmp(linea + 3, "-") ? linea + 3 : "";
-    bool alfanumerica = true;
-    for (const char* c = clave; *c; c++) alfanumerica &= isalnum((unsigned char)*c) != 0;
-    if (!alfanumerica) registrar("[THINGSPEAK] la clave solo admite letras y numeros");
-    else {
-      ajustesGuardarTsKey(clave);
-      registrar("[THINGSPEAK] clave actualizada");
-    }
   } else if (!strcmp(linea, "estado")) {
     imprimirEstado();
   } else if (!strcmp(linea, "ayuda")) {

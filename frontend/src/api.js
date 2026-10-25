@@ -36,6 +36,7 @@ export function crearCliente(base, fetchImpl = fetch) {
     nodos: async () => (await llamar("api/nodos")) ?? [],
     lecturas: async ({ limit = 50, nodo, horas } = {}) =>
       (await llamar("api/lecturas", { limit, nodo, horas })) ?? [],
+    mensajes: async ({ limit = 20 } = {}) => (await llamar("api/mensajes", { limit })) ?? [],
     ultima: ({ nodo } = {}) => llamar("api/lecturas/ultima", { nodo }), // null si no hay lecturas
   };
 }

@@ -9,7 +9,7 @@ tareaLoRa ──LoRa 915 MHz, SF7/BW125/CR4-5, CRC──► tareaLoRa (receptor)
                                                      ▼ cola (20)
                                                   tareaRed ──POST JSON──► API Flask ──► Firestore ◄── GET ── dashboard
                                                      ▲ │                        (X-API-Key)
-teléfono ──BLE (Nordic UART)──► callback BLE ──────┘ └─POST JSON──► ThingSpeak (field/status)
+teléfono ──BLE (Nordic UART)──► callback BLE ──────┘ └─POST /api/mensajes──► API ──► Firestore (colección mensajes)
 tareaLed: único dueño del LED   tareaSerie: Wi-Fi y ajustes en cualquier momento
 ```
 
@@ -17,7 +17,7 @@ tareaLed: único dueño del LED   tareaSerie: Wi-Fi y ajustes en cualquier momen
 
 - **LoRa**: emisor → receptor, lecturas del sensor.
 - **BLE**: teléfono → receptor (mensajes, requisito de la guía) y teléfono → emisor (comandos del bombillo). No sustituye a LoRa.
-- **Wi-Fi/HTTP**: receptor → API (lecturas) y receptor → ThingSpeak (mensajes BLE).
+- **Wi-Fi/HTTP**: receptor → API (`/api/lecturas` y `/api/mensajes`).
 
 ## Contrato LoRa (compacto, ASCII)
 
@@ -62,7 +62,7 @@ La cola llena descarta el trabajo más antiguo y lo cuenta. Wi-Fi se gestiona co
 1. **Firestore solo vía API**; reglas deniegan a clientes. El dashboard consume la API (sin credenciales en el navegador).
 2. **Flask**, compatible con el repo de referencia `MateoNaranjo/API-ESP32` (se reutilizó su contrato y se amplió: paquete `app/`, deduplicación, `/api/nodos`, filtro `horas`, 503 ante fallo de almacenamiento, `X-API-Key` en tiempo constante, límite de cuerpo).
 3. **BLE y Wi-Fi simultáneos** en el receptor (la alternancia del Anexo 2 de la guía aplica a Bluetooth *clásico*). Sin probar en hardware.
-4. **ThingSpeak** solo para los mensajes BLE (lo que pide la guía); Firebase sigue siendo el backend principal.
+4. **Sin ThingSpeak** (decisión del usuario): la guía lo menciona, pero el dashboard propio lo reemplaza. Los mensajes BLE van a `/api/mensajes` → Firestore `mensajes` y se muestran en el dashboard. La implementación anterior con ThingSpeak está en el commit `818478d`.
 5. **Receptor compilado como «ESP32 Dev Module» con `min_spiffs`** porque BLE+Wi-Fi+TLS ocupan ≈1.7 MB (>1.3 MB del esquema por defecto). Las placas Heltec/TTGO del core asumen 8 MB o particiones pequeñas.
 6. **Emisor sin Wi-Fi**: la guía lo exige en un único programa, que es el receptor; el emisor tiene BLE (comandos) pero no Wi-Fi.
 7. **Dashboard sin framework** (Vite + JS) por el equipo de 4 GB de RAM.

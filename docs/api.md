@@ -8,6 +8,8 @@ Base: `http://localhost:5000` en local. Respuestas JSON en UTF-8. Escritura prot
 | `POST /api/lecturas` | Valida y guarda una lectura | 201 creada · 200 `duplicado:true` · 400 inválida · 401 clave · 413 >4 KB · 503 almacenamiento caído |
 | `GET /api/lecturas?limit=50&nodo=emisor-01&horas=24` | Más reciente primero. `limit` 1–`MAX_LIMIT`(500), `horas` filtra por `creadoEn` | 200 · 400 parámetro no entero · 503 |
 | `GET /api/lecturas/ultima?nodo=emisor-01` | Última lectura | 200 · 404 sin lecturas · 503 |
+| `POST /api/mensajes` | Mensaje BLE `{"nodo":"receptor-01","texto":"..."}` (texto 1–100, sin caracteres de control); exige `X-API-Key` | 201 · 400 · 401 · 503 |
+| `GET /api/mensajes?limit=20` | Mensajes recientes | 200 · 400 · 503 |
 | `GET /api/nodos` | Nodos vistos recientemente | 200 · 503 |
 
 ## Cuerpo del POST

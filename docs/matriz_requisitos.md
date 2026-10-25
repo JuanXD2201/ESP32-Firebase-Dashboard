@@ -12,13 +12,13 @@ Ningún requisito está marcado «aprobado en hardware»: las placas no estaban 
 | 1 | SSID y contraseña Wi-Fi por monitor serie «en cualquier momento» | `receptor.ino` · `tareaSerie`, `procesarLinea` (comando `wifi`) | Compila; lógica no automatizada | Implementado · Pendiente HW |
 | 2 | Recibir datos del celular por BLE y mostrarlos en serie | `receptor.ino` · `CallbackEscritura::onWrite` | Compila | Implementado · Pendiente HW |
 | 3 | LED: 3 parpadeos, 0.25 s ON / 0.25 s OFF al recibir BLE | `receptor.ino` · `tareaLed` → `parpadear(3,250,250)` | Compila | Implementado · Pendiente HW |
-| 4 | HTTP POST a ThingSpeak con los datos recibidos (JSON) | `receptor.ino` · `enviarTrabajo`; `thingspeak.h` · `tsConstruirJson`; `nube.h` | `test_firmware.cpp::thingspeak_mensajes_ble` (JSON) | Implementado · Probado SW (JSON) · Pendiente HW/clave ThingSpeak |
+| 4 | HTTP POST a la nube con los datos recibidos (JSON). **Cambio respecto a la guía**: la guía nombra ThingSpeak; por decisión del usuario se usa la API propia → Firestore → dashboard | `receptor.ino` · `enviarTrabajo`; `mensajes.h` · `msgConstruirJson`; `backend/app/__init__.py` · `/api/mensajes` | `test_firmware.cpp::mensajes_ble_a_json`, `test_api.py` (mensajes) | Implementado · Probado SW · Pendiente HW · **Desviación declarada de la guía** |
 | 5 | LED: 2 parpadeos, 0.5 s ON / 0.5 s OFF al éxito de la nube | `receptor.ino` · `tareaRed` → `LED_NUBE_OK` → `parpadear(2,500,500)` | Compila | Implementado · Pendiente HW |
 | 6 | FreeRTOS con tareas separadas (BLE, Wi-Fi, LED) | `receptor.ino` · `tareaLoRa`, `tareaRed`, `tareaLed`, `tareaSerie` + callback BLE | Compila | Implementado · Pendiente HW |
-| — | Dashboard en la interfaz de ThingSpeak (objetivo 4 de «Problema de diseño») | Configuración manual en thingspeak.com | — | **Bloqueado**: requiere cuenta/canal del usuario (pasos en `docs/despliegue.md`) |
+| — | Dashboard de visualización (objetivo 4 de la guía) | `frontend/` publicado en https://esp32-8aa66.web.app (panel «Mensajes BLE») | Vitest | Implementado en el dashboard propio, **no** en ThingSpeak (decisión del usuario) |
 
 Notas: la guía señala que sus pruebas «deben funcionar en conjunto en un mismo código»; el receptor las reúne.
-Éxito de la nube = HTTP 200/201 (ThingSpeak: además cuerpo ≠ `0`). El receptor envía a ThingSpeak solo los mensajes BLE; Firebase es el backend principal.
+Éxito de la nube = HTTP 200/201 de la API. Los mensajes BLE se envían a `/api/mensajes`. ThingSpeak se eliminó a petición del usuario; si el docente lo exige, la versión con ThingSpeak está en el commit `818478d`.
 
 ## B. Entregables del prompt maestro
 
@@ -38,4 +38,3 @@ Notas: la guía señala que sus pruebas «deben funcionar en conjunto en un mism
 | E6 | Diagrama y contratos documentados | `docs/arquitectura.md` | — | Implementado |
 | E7 | Pruebas y evidencias | `docs/pruebas.md` | — | Implementado |
 | E8 | Repo portable, `.env.example`, `.gitignore`, scripts | raíz, `scripts/` | Auditoría de secretos | Implementado |
-| — | ThingSpeak configurable sin sustituir Firebase | `receptor.ino` (`ts <clave>`) | JSON probado | Implementado · Pendiente HW |

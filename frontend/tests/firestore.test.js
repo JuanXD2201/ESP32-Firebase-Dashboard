@@ -48,3 +48,15 @@ describe("firestore REST", () => {
     await expect(crearClienteFirestore("p", fred).health()).rejects.toThrow(/Firestore/);
   });
 });
+
+describe("mensajes BLE", () => {
+  it("consulta la colección mensajes", async () => {
+    const doc = { name: "projects/p/databases/(default)/documents/mensajes/abc", fields: { texto: { stringValue: "hola" }, nodo: { stringValue: "receptor-01" } } };
+    const f = vi.fn().mockResolvedValue({ ok: true, json: async () => [{ document: doc }] });
+    const r = await crearClienteFirestore("p", f).mensajes({ limit: 5 });
+    expect(r).toEqual([{ id: "abc", texto: "hola", nodo: "receptor-01" }]);
+    const q = JSON.parse(f.mock.calls[0][1].body).structuredQuery;
+    expect(q.from[0].collectionId).toBe("mensajes");
+    expect(q.limit).toBe(5);
+  });
+});

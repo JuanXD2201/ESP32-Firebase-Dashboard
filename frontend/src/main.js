@@ -21,6 +21,7 @@ const estado = {
   apiOk: null,
   cargando: true,
   lecturas: [],
+  mensajes: [],
   health: null,
   ultimaConsulta: null,
   temporizador: null,
@@ -73,12 +74,14 @@ async function consultar() {
       estado.apiOk = true;
       estado.health = { almacenamiento: "demostración (sin base de datos)", autenticacion_escritura: false };
     } else if (estado.cliente) {
-      const [lecturas, health] = await Promise.all([
+      const [lecturas, health, mensajes] = await Promise.all([
         estado.cliente.lecturas(f),
         estado.cliente.health(),
+        estado.cliente.mensajes({ limit: 20 }).catch(() => estado.mensajes), // un fallo aquí no tumba lo demás
         actualizarNodos().catch(() => {}),
       ]);
       estado.lecturas = lecturas;
+      estado.mensajes = mensajes;
       estado.health = health;
       estado.apiOk = true;
       $("aviso-error").hidden = true;
@@ -132,6 +135,19 @@ function pintar() {
   $("vacio").hidden = estado.lecturas.length > 0 || estado.cargando;
   $("contador").textContent = estado.lecturas.length ? `(${estado.lecturas.length})` : "";
   dibujarGrafico($("grafico"), estado.lecturas);
+
+  // textContent: el texto del teléfono nunca se interpreta como HTML.
+  $("mensajes").replaceChildren(
+    ...estado.mensajes.map((m) => {
+      const li = document.createElement("li");
+      const hora = document.createElement("time");
+      hora.textContent = `${formatearFecha(m.creadoEn)} · ${m.nodo ?? ""}`;
+      li.append(hora, document.createTextNode(m.texto ?? ""));
+      return li;
+    }),
+  );
+  $("vacio-msg").hidden = estado.mensajes.length > 0 || estado.cargando;
+  $("contador-msg").textContent = estado.mensajes.length ? `(${estado.mensajes.length})` : "";
 
   $("s-api").textContent = estado.demo
     ? "Modo demostración"

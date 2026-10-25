@@ -9,6 +9,7 @@ def cargar_config(overrides=None):
         "GOOGLE_APPLICATION_CREDENTIALS": os.getenv("GOOGLE_APPLICATION_CREDENTIALS", ""),
         "FIREBASE_PROJECT_ID": os.getenv("FIREBASE_PROJECT_ID", ""),
         "FIRESTORE_COLLECTION": os.getenv("FIRESTORE_COLLECTION", "lecturas"),
+        "FIRESTORE_COLLECTION_MENSAJES": os.getenv("FIRESTORE_COLLECTION_MENSAJES", "mensajes"),
         # Si se define, POST /api/lecturas exige el header X-API-Key con este valor.
         "API_KEY": os.getenv("API_KEY", ""),
         # Orígenes permitidos para CORS (separados por coma). "*" = cualquiera.

@@ -11,7 +11,6 @@ struct Ajustes {
   char clave[65];
   char apiUrl[160];
   char apiKey[64];
-  char tsKey[24];
 };
 
 static SemaphoreHandle_t mtxAjustes = nullptr;
@@ -32,7 +31,6 @@ static void ajustesIniciar() {
   ajustesCopiar(ajustesActuales.apiUrl, sizeof(ajustesActuales.apiUrl),
                 p.getString("apiUrl", API_URL_POR_DEFECTO));
   ajustesCopiar(ajustesActuales.apiKey, sizeof(ajustesActuales.apiKey), p.getString("apiKey", ""));
-  ajustesCopiar(ajustesActuales.tsKey, sizeof(ajustesActuales.tsKey), p.getString("tsKey", ""));
   p.end();
 }
 
@@ -66,7 +64,4 @@ static void ajustesGuardarApiUrl(const char* v) {
 }
 static void ajustesGuardarApiKey(const char* v) {
   ajustesGuardarTexto("apiKey", ajustesActuales.apiKey, sizeof(ajustesActuales.apiKey), v);
-}
-static void ajustesGuardarTsKey(const char* v) {
-  ajustesGuardarTexto("tsKey", ajustesActuales.tsKey, sizeof(ajustesActuales.tsKey), v);
 }

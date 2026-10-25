@@ -78,6 +78,7 @@ export function crearClienteFirestore(proyecto, fetchImpl = fetch) {
     },
     nodos: async () => [...new Set((await consultar({ limit: 200 })).map((l) => l.nodo))],
     lecturas: (opciones = {}) => consultar(opciones),
+    mensajes: ({ limit = 20 } = {}) => consultar({ coleccion: "mensajes", limit }),
     ultima: async (opciones = {}) => (await consultar({ ...opciones, limit: 1 }))[0] ?? null,
   };
 }

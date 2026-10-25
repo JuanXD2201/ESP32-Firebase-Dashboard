@@ -32,14 +32,6 @@ Concede a la cuenta de servicio de Cloud Run el rol «Cloud Datastore User». De
 **Sin facturación**: ejecuta la API en un PC de la red del laboratorio (`python -m app`) y apunta el receptor a `http://<IP-PC>:5000/api/lecturas`;
 el dashboard desplegado en Hosting no podrá alcanzarla (HTTPS→HTTP local), así que úsalo en local (`npm run dev`) con `apiUrl` local.
 
-## 3. ThingSpeak (guía académica)
-
-1. Crea cuenta y un canal con Field 1..N; copia la **Write API Key**.
-2. En el monitor serie del receptor: `ts <WRITE_API_KEY>`.
-3. Envía un mensaje por BLE (nRF Connect → servicio `6E400001-…` → característica `6E400002-…`): `23.5` → field1, `3:18.2` → field3, texto → status.
-4. En ThingSpeak añade visualizaciones (gráficas/indicadores) al canal: ese es el «dashboard de ThingSpeak» que pide la guía.
-Límite de la cuenta gratuita: 1 actualización cada 15 s (el firmware espera).
-
-## 4. Publicar cambios en GitHub
+## 3. Publicar cambios en GitHub
 
 `git add -A && git commit -m "..." && git push`. Antes: `git status` y revisa que no haya `.env`, claves ni `*.bin`.

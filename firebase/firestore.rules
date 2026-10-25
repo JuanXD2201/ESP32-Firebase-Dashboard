@@ -14,6 +14,12 @@ service cloud.firestore {
       allow list: if request.query.limit <= 500;
       allow create, update, delete: if false;
     }
+    // Mensajes recibidos por BLE en el receptor (texto corto): misma política que `lecturas`.
+    match /mensajes/{mensaje} {
+      allow get: if true;
+      allow list: if request.query.limit <= 500;
+      allow create, update, delete: if false;
+    }
     match /{otro=**} {
       allow read, write: if false;
     }

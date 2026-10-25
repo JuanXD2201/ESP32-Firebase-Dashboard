@@ -13,7 +13,7 @@ Drivers USB: CH9102 (emisor, wch.cn) y CP210x (receptor).
 6. Datos de prueba sin hardware: `python scripts/simular_receptor.py http://localhost:5000` (marcados `simulado`).
 7. Dashboard: edita `frontend/public/config.json` (`"apiUrl": "http://localhost:5000"`), `cd frontend && npm run dev`. Con `?demo=1` o el botón se activa el modo demostración (datos ficticios, rotulado).
 8. Firmware: `.\scripts\compilar_firmware.ps1`; cargar desde Arduino IDE/CLI con los FQBN de `docs/conexiones_hardware.md`.
-9. Configurar el receptor por el monitor serie (115200): `wifi`, `api http://<IP-PC>:5000/api/lecturas`, `apikey <clave>`, `ts <WRITE_KEY>`, `estado`.
+9. Configurar el receptor por el monitor serie (115200): `wifi`, `api http://<IP-PC>:5000`, `apikey <clave>`, `estado`.
    Si la API usa `API_KEY`, el mismo valor va en `apikey`.
 10. Firebase y despliegue: `docs/firebase.md`, `docs/despliegue.md`.
 11. Publicar cambios: `git add -A && git commit && git push` (revisa `git status`: nada de `.env`, claves ni `*.bin`).

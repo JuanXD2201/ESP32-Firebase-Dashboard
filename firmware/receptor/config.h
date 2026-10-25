@@ -52,9 +52,8 @@
 #define HTTP_TIMEOUT_MS 5000
 #define HTTP_REINTENTOS 3
 #define HTTP_PAUSA_REINTENTO_MS 2000
-#define THINGSPEAK_URL "http://api.thingspeak.com/update.json"
-#define THINGSPEAK_INTERVALO_MIN_MS 15000   // límite de la cuenta gratuita
-#define API_URL_POR_DEFECTO ""              // se configura por serie: api <url>
+#define API_URL_POR_DEFECTO ""              // URL base de la API; se configura por serie: api <url>
+#define RECEPTOR_ID "receptor-01"           // nodo con el que se registran los mensajes BLE
 
 // ---------- FreeRTOS ----------
 #define COLA_NUBE_LONGITUD 20

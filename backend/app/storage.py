@@ -118,7 +118,7 @@ class MemoriaStorage:
         return vistos
 
 
-def crear_almacenamiento(config):
+def crear_almacenamiento(config, coleccion=None):
     if config["STORAGE"] == "memoria":
         return MemoriaStorage()
     credenciales = config["GOOGLE_APPLICATION_CREDENTIALS"] or None
@@ -129,7 +129,7 @@ def crear_almacenamiento(config):
             "Credentials (gcloud auth application-default login) o STORAGE=memoria."
         )
     return FirestoreStorage(
-        config["FIRESTORE_COLLECTION"],
+        coleccion or config["FIRESTORE_COLLECTION"],
         proyecto=config["FIREBASE_PROJECT_ID"] or None,
         credenciales=credenciales,
     )

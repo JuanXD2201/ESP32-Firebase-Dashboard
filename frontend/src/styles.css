@@ -87,6 +87,9 @@ th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--bor
 th { position: sticky; top: 0; background: var(--superficie); color: var(--suave); font-weight: 600; }
 tr.simulada td { font-style: italic; color: var(--alerta); }
 .vacio-texto { color: var(--suave); text-align: center; padding: 16px 0 4px; }
+.mensajes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 260px; overflow-y: auto; }
+.mensajes li { padding: 8px 12px; border: 1px solid var(--borde); border-radius: 8px; overflow-wrap: anywhere; }
+.mensajes time { display: block; font-size: 0.78rem; color: var(--suave); }
 .sistema { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
 .sistema dt { color: var(--suave); }
 .sistema dd { margin: 0; overflow-wrap: anywhere; }

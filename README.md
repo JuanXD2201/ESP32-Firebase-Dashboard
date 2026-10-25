@@ -6,7 +6,7 @@ Un dashboard web muestra las lecturas.
 
 ```
 AM2301 → emisor (T3 V1.6.1) ──LoRa 915 MHz──► receptor ──HTTP POST──► API Flask ──► Firestore
-                  ▲ BLE (comandos)             ▲ BLE (mensajes) └─POST─► ThingSpeak         │
+                  ▲ BLE (comandos)             ▲ BLE (mensajes) └─POST /api/mensajes─►┘ │
                teléfono                     teléfono                         dashboard ◄─GET─┘
 ```
 
@@ -62,7 +62,7 @@ Guía completa: [docs/instalacion.md](docs/instalacion.md).
 
 Sin credenciales en el repositorio. `.env`, claves de cuenta de servicio y `*.bin` están en `.gitignore`.
 Firestore (`esp32-8aa66`): clientes solo pueden **leer** `lecturas` (el dashboard); toda escritura pasa por la API (Admin SDK). El ESP32 no lleva credenciales
-administrativas; la clave `X-API-Key` y la de ThingSpeak se guardan en NVS por comandos serie, no en el código.
+administrativas; la clave `X-API-Key` se guarda en NVS por comandos serie, no en el código.
 **No publiques `flash_com3.bin` / `flash_com4.bin`**: contienen redes Wi-Fi y contraseñas antiguas.
 
 ## Licencia
