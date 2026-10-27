@@ -1,9 +1,9 @@
 # Firebase y Firestore
 
-Proyecto: **«Esp32»**, ID técnico **`esp32-8aa66`** (verificado en la consola, plan Spark). `firebase/.firebaserc` ya lo fija.
+Proyecto: ID técnico **`esp32-980d5`** (plan Spark). `firebase/.firebaserc` y `frontend/public/config.json` ya lo fijan.
 Plan Spark ⇒ sin Cloud Run: el dashboard desplegado en Hosting **lee Firestore directamente** (REST, solo lectura) y las escrituras
 las hace la API ejecutada en un PC con cuenta de servicio.
-Estado de la base: la creación de la base `(default)` se inició en la consola; **falta elegir la ubicación** (irreversible) y confirmar.
+Estado de la base: `(default)` creada; la colección `lecturas` ya recibe datos de la API. **Faltan desplegar** las reglas e índices de `firebase/`.
 
 ## Modelo de datos
 
