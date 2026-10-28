@@ -1,5 +1,6 @@
 {
   "projects": {
     "default": "esp32-980d5"
+    
   }
 }
