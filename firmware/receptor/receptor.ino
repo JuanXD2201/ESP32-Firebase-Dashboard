@@ -393,7 +393,7 @@ static void tareaRed(void*) {
 // ---------------------------------------------------------------- serie (comandos y Wi-Fi)
 static void imprimirEstado() {
   Ajustes a = ajustesLeer();
-  registrar("[ESTADO] placa=%s lora=%s ultimo rssi=%d snr=%.1f", PERFIL_PLACA == PERFIL_HELTEC_V2 ? "Heltec V2 (sin confirmar)" : "TTGO LoRa32 V1 (sin confirmar)",
+  registrar("[ESTADO] placa=%s lora=%s ultimo rssi=%d snr=%.1f", PERFIL_PLACA == PERFIL_TTGO_T3_V16 ? "TTGO T3 V1.6.1" : (PERFIL_PLACA == PERFIL_HELTEC_V2 ? "Heltec V2 (sin confirmar)" : "TTGO LoRa32 V1 (sin confirmar)"),
             loraListo ? "ok" : "ERROR", (int)ultimoRssi, (double)ultimoSnr);
   registrar("[ESTADO] wifi=%s ssid=\"%s\" ip=%s", WiFi.status() == WL_CONNECTED ? "conectado" : "desconectado",
             a.ssid[0] ? a.ssid : "(sin configurar)",

@@ -16,14 +16,14 @@ placas conectadas durante este trabajo.** Los pines están centralizados en `fir
 
 Evitar: 21/22 (OLED), 34–39 (solo entrada), 6–11 (flash), 0/2/12/15 (arranque), 13 (SD).
 
-## Receptor — ESP32-D0WDQ6 + CP2102 (COM4), **placa sin confirmar**
+## Receptor — LILYGO TTGO T3 V1.6.1 (ESP32-PICO-D4, CH9102)
 
-Heltec WiFi LoRa 32 V2 o TTGO LoRa32 V1.0 (mismos pines LoRa). Confirma la serigrafía y ajusta `PERFIL_PLACA` en `config.h`.
+Verificado el 2026-11-05: el enlace emisor → receptor funcionó con datos reales del AM2302 (RSSI ≈ -30 dBm). Perfil `PERFIL_TTGO_T3_V16` en `config.h`. Los perfiles Heltec V2 / TTGO LoRa32 V1 quedan para la placa receptora anterior (ESP32-D0WDQ6 + CP2102).
 
 | Función | GPIO |
 |---|---|
 | LoRa SCK / MISO / MOSI / CS | 5 / 19 / 27 / 18 |
-| LoRa RST / DIO0 | 14 / 26 |
+| LoRa RST / DIO0 | 23 / 26 |
 | LED | 25 |
 | Serie | 115200 baud |
 

@@ -1,7 +1,6 @@
 // config.h - configuración centralizada del RECEPTOR / pasarela LoRa -> Wi-Fi -> nube.
-// La revisión exacta de la placa NO está confirmada (Heltec WiFi LoRa 32 V2 o TTGO LoRa32 V1.0,
-// ver avances_ESP32.txt). Ambas comparten los pines LoRa reportados. Confirma la serigrafía y
-// ajusta PERFIL_PLACA si difiere. No se ha probado en hardware.
+// Placa actual (escaneo 2026-11-05): LILYGO TTGO T3 V1.6.1 (ESP32-PICO-D4, CH9102), igual que el emisor.
+// Los perfiles Heltec V2 / TTGO LoRa32 V1 quedan para la placa receptora anterior (ESP32-D0WDQ6).
 #pragma once
 
 #include <Arduino.h>
@@ -9,9 +8,19 @@
 // ---------- Perfil de placa ----------
 #define PERFIL_HELTEC_V2 1
 #define PERFIL_TTGO_LORA32_V1 2
-#define PERFIL_PLACA PERFIL_HELTEC_V2
+#define PERFIL_TTGO_T3_V16 3
+#define PERFIL_PLACA PERFIL_TTGO_T3_V16
 
-#if PERFIL_PLACA == PERFIL_HELTEC_V2 || PERFIL_PLACA == PERFIL_TTGO_LORA32_V1
+#if PERFIL_PLACA == PERFIL_TTGO_T3_V16
+// SX1276 de fábrica del T3 V1.6.1 (mismos pines que el emisor)
+#define PIN_LORA_SCK 5
+#define PIN_LORA_MISO 19
+#define PIN_LORA_MOSI 27
+#define PIN_LORA_CS 18
+#define PIN_LORA_RST 23
+#define PIN_LORA_DIO0 26
+#define PIN_LED 25
+#elif PERFIL_PLACA == PERFIL_HELTEC_V2 || PERFIL_PLACA == PERFIL_TTGO_LORA32_V1
 // SX1276 (pines reportados por el escaneo; coinciden en ambos perfiles)
 #define PIN_LORA_SCK 5
 #define PIN_LORA_MISO 19

@@ -26,9 +26,9 @@
 #define LORA_POTENCIA_DBM 17
 #define LORA_SYNC_WORD 0x12
 
-// ---------- Sensor AM2301 (DHT21), 1 hilo ----------
+// ---------- Sensor AM2302 (ASAIR, = DHT22), 1 hilo ----------
 #define PIN_AM2301 14                  // GPIO14 = SCK de la microSD: válido si no se usa la SD
-#define TIPO_SENSOR DHT21
+#define TIPO_SENSOR DHT22
 #define SENSOR_PERIODO_MS 5000         // intervalo entre lecturas/envíos
 #define SENSOR_PERIODO_MIN_MS 2000     // límite del sensor (>= 2 s)
 static_assert(SENSOR_PERIODO_MS >= SENSOR_PERIODO_MIN_MS, "El AM2301 exige >= 2 s entre lecturas");

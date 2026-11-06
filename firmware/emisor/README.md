@@ -1,6 +1,6 @@
 # Firmware emisor (LILYGO TTGO T3 V1.6.1)
 
-Lee el AM2301 cada 5 s (mínimo permitido 2 s), valida, aplica la regla del bombillo (ON ≥30 °C, OFF ≤28 °C, o forzado) y transmite por LoRa 915 MHz.
+Lee el AM2302 (DHT22) cada 5 s (mínimo permitido 2 s), valida, aplica la regla del bombillo (ON ≥30 °C, OFF ≤28 °C, o forzado) y transmite por LoRa 915 MHz.
 
 - Pines/constantes: `config.h`. Protocolo: `protocolo.h` (idéntico al del receptor).
 - Librerías: LoRa 0.8.0 · DHT sensor library 1.4.7 · Adafruit Unified Sensor 1.1.15. Core esp32 2.0.12.
