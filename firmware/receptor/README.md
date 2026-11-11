@@ -11,3 +11,10 @@ LoRa → valida → cola → HTTP POST a la API. BLE (teléfono) → serie + LED
 - LED: BLE ⇒ 3×(250/250 ms); éxito de nube ⇒ 2×(500/500 ms). Un solo dueño (`tareaLed`).
 - La URL `https://` valida el certificado con el bundle del core (enlaza; sin probar en dispositivo). `http://` va sin cifrar: úsalo solo en red local.
 - Sin probar en hardware.
+
+## Abrir en Arduino IDE
+1. Abre `firmware/receptor/receptor.ino`.
+2. Instala **esp32 by Espressif Systems 2.0.12** y la librería **LoRa** 0.8.0.
+3. Placa **ESP32 Dev Module**, *Partition Scheme* = **Minimal SPIFFS (1.9MB APP with OTA)**, *Flash Size* 4MB (el programa ocupa ≈1.7 MB).
+4. Ajusta `PERFIL_PLACA` en `config.h` (`PERFIL_HELTEC_V2` para ESP32-D0WDQ6, `PERFIL_TTGO_T3_V16` para ESP32-PICO-D4).
+5. Monitor serie a 115200 baudios.

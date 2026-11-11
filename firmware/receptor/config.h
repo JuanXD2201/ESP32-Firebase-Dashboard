@@ -1,6 +1,6 @@
 // config.h - configuración centralizada del RECEPTOR / pasarela LoRa -> Wi-Fi -> nube.
-// Placa actual (escaneo 2026-11-05): LILYGO TTGO T3 V1.6.1 (ESP32-PICO-D4, CH9102), igual que el emisor.
-// Los perfiles Heltec V2 / TTGO LoRa32 V1 quedan para la placa receptora anterior (ESP32-D0WDQ6).
+// Placa actual (escaneo 2026-11-10): ESP32-D0WDQ6 de 26 MHz (Heltec V2 / TTGO LoRa32 V1, CP2102).
+// El perfil TTGO T3 V1.6.1 se usa con las placas ESP32-PICO-D4 (cambia PERFIL_PLACA).
 #pragma once
 
 #include <Arduino.h>
@@ -9,7 +9,9 @@
 #define PERFIL_HELTEC_V2 1
 #define PERFIL_TTGO_LORA32_V1 2
 #define PERFIL_TTGO_T3_V16 3
-#define PERFIL_PLACA PERFIL_TTGO_T3_V16
+#ifndef PERFIL_PLACA                    // se puede forzar al compilar: -DPERFIL_PLACA=<n>
+#define PERFIL_PLACA PERFIL_HELTEC_V2
+#endif
 
 #if PERFIL_PLACA == PERFIL_TTGO_T3_V16
 // SX1276 de fábrica del T3 V1.6.1 (mismos pines que el emisor)

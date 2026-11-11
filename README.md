@@ -43,6 +43,20 @@ scripts/                             instalar, probar, compilar firmware, simula
 docs/                                arquitectura, instalación, hardware, API, Firebase, despliegue, pruebas
 ```
 
+## Instalación automática (Windows)
+
+Con Git instalado, en `cmd` o PowerShell:
+
+```
+git clone https://github.com/JuanXD2201/ESP32-Firebase-Dashboard
+cd ESP32-Firebase-Dashboard
+scripts\instalar_todo.bat -Emisor COM8 -Receptor COM7
+```
+
+Instala Python (con `winget` si falta), `arduino-cli`, el core `esp32:esp32@2.0.12` y las librerías, crea el entorno de la API y `backend\.env` (clave aleatoria), compila y sube el firmware (detecta si la placa es LILYGO T3 o Heltec/TTGO LoRa32 V1) y configura el Wi-Fi del receptor.
+Sin `-Emisor`/`-Receptor` pregunta los puertos; `-SoloInstalar` no toca placas; `-SinWifi` omite el Wi-Fi.
+Para Firestore necesita la clave JSON de la cuenta de servicio (no está en el repositorio); sin ella la API queda en modo memoria. Sin probar en un PC limpio.
+
 ## Inicio rápido (otro computador)
 
 Requisitos: Git, Python 3.12+, Node 20.19+/22.12+, [Arduino CLI](https://arduino.github.io/arduino-cli/) (solo firmware).
