@@ -1,7 +1,8 @@
 # Despliegue
 
-**Estado:** dashboard desplegado en **https://esp32-8aa66.web.app** y reglas/índices de Firestore desplegados (2026-10-25).
-**Pendiente:** la API que escribe en Firestore (necesita clave de cuenta de servicio) y la conexión real de los ESP32.
+**Estado (2026-11-10):** el proyecto activo es **`esp32-980d5`**. La cadena emisor → LoRa → receptor → Wi-Fi → API → Firestore
+→ dashboard local está probada en hardware. **Pendiente:** desplegar Hosting (y reglas/índices) en `esp32-980d5`
+(hoy https://esp32-980d5.web.app responde 404). El despliegue anterior (2026-10-25) está en https://esp32-8aa66.web.app.
 Plan Spark: no hay Cloud Run; la API corre en un PC (`STORAGE=firestore`, `GOOGLE_APPLICATION_CREDENTIALS=<ruta del JSON>`).
 
 ## 1. Dashboard en Firebase Hosting
@@ -10,7 +11,7 @@ Plan Spark: no hay Cloud Run; la API corre en un PC (`STORAGE=firestore`, `GOOGL
 cd frontend && npm ci
 # frontend/public/config.json:  {"apiUrl": "<URL pública de la API>", "urlDespliegue": "", "intervaloActualizacionS": 10}
 npm run build            # genera firebase/public
-cd ../firebase && firebase deploy --only hosting   # .firebaserc ya fija esp32-8aa66
+cd ../firebase && firebase deploy --only hosting   # .firebaserc ya fija esp32-980d5
 ```
 
 Hosting entrega `https://<ID_PROYECTO>.web.app`. El dashboard muestra esa URL **automáticamente** (usa `location.origin`

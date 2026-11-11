@@ -79,7 +79,7 @@ $envFile = Join-Path $raiz "backend\.env"
 if (Test-Path $envFile) {
   Write-Host "backend\.env ya existe: se conserva."
 } else {
-  $proyecto = "esp32-8aa66"
+  $proyecto = "esp32-980d5"
   $rc = Join-Path $raiz "firebase\.firebaserc"
   if (Test-Path $rc) { try { $proyecto = (Get-Content $rc -Raw | ConvertFrom-Json).projects.default } catch {} }
   $apiKey = & $venvPy -c "import secrets; print(secrets.token_urlsafe(24))"
@@ -144,5 +144,5 @@ if ($Receptor -and -not $SinWifi) {
   & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "conectar_receptor.ps1") -Puerto $Receptor
 }
 
-Write-Host "`nListo. Dashboard: https://esp32-8aa66.web.app" -ForegroundColor Green
+Write-Host "`nListo. Dashboard: https://esp32-980d5.web.app" -ForegroundColor Green
 Write-Host "Para volver a lanzar la API: backend\.venv\Scripts\python -m app   (en la carpeta backend)"

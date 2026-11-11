@@ -257,6 +257,12 @@ static bool wifiIntentando = false;
 static uint32_t wifiInicioIntento = 0;
 static uint32_t wifiProximoIntento = 0;
 static uint32_t wifiPausaMs = WIFI_REINTENTO_MIN_MS;
+static volatile uint8_t wifiUltimoMotivo = 0;  // wifi_err_reason_t del último STA_DISCONNECTED
+
+// Callback de evento (tarea del sistema): solo guarda el motivo; se imprime desde tareaRed.
+static void alDesconectarWifi(WiFiEvent_t, WiFiEventInfo_t info) {
+  wifiUltimoMotivo = info.wifi_sta_disconnected.reason;
+}
 
 // Máquina de estados sin esperas: nunca bloquea LoRa ni BLE (otras tareas).
 static void gestionarWifi(const Ajustes& a) {
@@ -283,8 +289,8 @@ static void gestionarWifi(const Ajustes& a) {
       WiFi.disconnect(true);
       wifiIntentando = false;
       wifiProximoIntento = ahora + wifiPausaMs;
-      registrar("[WIFI] no se pudo conectar a \"%s\"; reintento en %lu s", a.ssid,
-                (unsigned long)(wifiPausaMs / 1000));
+      registrar("[WIFI] no se pudo conectar a \"%s\" (estado=%d motivo=%u); reintento en %lu s", a.ssid,
+                (int)WiFi.status(), (unsigned)wifiUltimoMotivo, (unsigned long)(wifiPausaMs / 1000));
       wifiPausaMs = min<uint32_t>(wifiPausaMs * 2, WIFI_REINTENTO_MAX_MS);
     }
     return;
@@ -368,6 +374,7 @@ static bool enviarTrabajo(const Trabajo& t, const Ajustes& a) {
 static void tareaRed(void*) {
   WiFi.persistent(false);
   WiFi.setAutoReconnect(false);
+  WiFi.onEvent(alDesconectarWifi, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   WiFi.mode(WIFI_STA);
   Trabajo t;
   for (;;) {

@@ -43,4 +43,4 @@ while ([datetime]::Now -lt $fin) {
   try { $l = $s.ReadLine().Trim(); if ($l -match 'ESTADO|WIFI|API|NUBE' -and $l -notmatch 'descartado') { Write-Host $l } } catch {}
 }
 $s.Close()
-Write-Host "Si dice wifi=conectado, las lecturas del emisor suben solas. Dashboard: https://esp32-8aa66.web.app"
+Write-Host "Si dice wifi=conectado, las lecturas del emisor suben solas. Dashboard: https://esp32-980d5.web.app"

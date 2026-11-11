@@ -12,7 +12,8 @@ AM2301 → emisor (T3 V1.6.1) ──LoRa 915 MHz──► receptor ──HTTP PO
 
 ## Aplicación web en producción
 
-**https://esp32-8aa66.web.app** (Firebase Hosting, proyecto `esp32-8aa66`; verificado: HTTP 200 y carga con estado «API conectada»).
+**https://esp32-980d5.web.app** (Firebase Hosting, proyecto `esp32-980d5`; **pendiente de desplegar**: hoy responde 404).
+La versión anterior sigue en https://esp32-8aa66.web.app (proyecto antiguo, sin los datos de la API).
 Lee Firestore directamente (solo lectura). Verificado de extremo a extremo con lecturas **simuladas** (API → Firestore → dashboard); luego se borraron.
 La colección `lecturas` está vacía hasta que los ESP32 escriban a través de la API (ver `docs/firebase.md`).
 
@@ -75,7 +76,7 @@ Guía completa: [docs/instalacion.md](docs/instalacion.md).
 ## Seguridad
 
 Sin credenciales en el repositorio. `.env`, claves de cuenta de servicio y `*.bin` están en `.gitignore`.
-Firestore (`esp32-8aa66`): clientes solo pueden **leer** `lecturas` (el dashboard); toda escritura pasa por la API (Admin SDK). El ESP32 no lleva credenciales
+Firestore (`esp32-980d5`): clientes solo pueden **leer** `lecturas` (el dashboard); toda escritura pasa por la API (Admin SDK). El ESP32 no lleva credenciales
 administrativas; la clave `X-API-Key` se guarda en NVS por comandos serie, no en el código.
 **No publiques `flash_com3.bin` / `flash_com4.bin`**: contienen redes Wi-Fi y contraseñas antiguas.
 

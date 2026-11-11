@@ -15,7 +15,7 @@ Ningún requisito está marcado «aprobado en hardware»: las placas no estaban 
 | 4 | HTTP POST a la nube con los datos recibidos (JSON). **Cambio respecto a la guía**: la guía nombra ThingSpeak; por decisión del usuario se usa la API propia → Firestore → dashboard | `receptor.ino` · `enviarTrabajo`; `mensajes.h` · `msgConstruirJson`; `backend/app/__init__.py` · `/api/mensajes` | `test_firmware.cpp::mensajes_ble_a_json`, `test_api.py` (mensajes) | Implementado · Probado SW · Pendiente HW · **Desviación declarada de la guía** |
 | 5 | LED: 2 parpadeos, 0.5 s ON / 0.5 s OFF al éxito de la nube | `receptor.ino` · `tareaRed` → `LED_NUBE_OK` → `parpadear(2,500,500)` | Compila | Implementado · Pendiente HW |
 | 6 | FreeRTOS con tareas separadas (BLE, Wi-Fi, LED) | `receptor.ino` · `tareaLoRa`, `tareaRed`, `tareaLed`, `tareaSerie` + callback BLE | Compila | Implementado · Pendiente HW |
-| — | Dashboard de visualización (objetivo 4 de la guía) | `frontend/` publicado en https://esp32-8aa66.web.app (panel «Mensajes BLE») | Vitest | Implementado en el dashboard propio, **no** en ThingSpeak (decisión del usuario) |
+| — | Dashboard de visualización (objetivo 4 de la guía) | `frontend/` para https://esp32-980d5.web.app (despliegue pendiente; antes esp32-8aa66.web.app) (panel «Mensajes BLE») | Vitest | Implementado en el dashboard propio, **no** en ThingSpeak (decisión del usuario) |
 
 Notas: la guía señala que sus pruebas «deben funcionar en conjunto en un mismo código»; el receptor las reúne.
 Éxito de la nube = HTTP 200/201 de la API. Los mensajes BLE se envían a `/api/mensajes`. ThingSpeak se eliminó a petición del usuario; si el docente lo exige, la versión con ThingSpeak está en el commit `818478d`.
@@ -34,7 +34,7 @@ Notas: la guía señala que sus pruebas «deben funcionar en conjunto en un mism
 | E4 | Estructura Firestore, reglas, integración real | `backend/app/storage.py`, `firebase/*` | `test_firestore_storage.py` (cliente **simulado**) | Implementado · Reglas/índice desplegados y verificados · Escritura/lectura reales vía API probadas (datos simulados) |
 | E4 | Reglas sin acceso público indiscriminado | `firebase/firestore.rules` (lectura solo de `lecturas`, escritura denegada) | curl real: lectura 200, escritura 403 | Probado (Firebase real) |
 | E5 | Dashboard con estados de carga/vacío/error, historial, filtros, estado del sistema | `frontend/src/*` | `frontend/tests/logica.test.js` (14), `vite build` | Implementado · Probado SW · Datos reales no verificados |
-| E5 | URL pública en la interfaz y README | `main.js::pintarDespliegue`, `README.md` | Prueba de `resolverUrlDespliegue` | Implementado · Desplegado: https://esp32-8aa66.web.app (datos reales: colección vacía) |
+| E5 | URL pública en la interfaz y README | `main.js::pintarDespliegue`, `README.md` | Prueba de `resolverUrlDespliegue` | Implementado · Despliegue en esp32-980d5 pendiente (antes: https://esp32-8aa66.web.app) |
 | E6 | Diagrama y contratos documentados | `docs/arquitectura.md` | — | Implementado |
 | E7 | Pruebas y evidencias | `docs/pruebas.md` | — | Implementado |
 | E8 | Repo portable, `.env.example`, `.gitignore`, scripts | raíz, `scripts/` | Auditoría de secretos | Implementado |

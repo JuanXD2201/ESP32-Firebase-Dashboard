@@ -1,6 +1,6 @@
 # Firebase y Firestore
 
-Proyecto: **«Esp32»**, ID técnico **`esp32-8aa66`** (verificado en la consola, plan Spark). `firebase/.firebaserc` ya lo fija.
+Proyecto: ID técnico **`esp32-980d5`** (el que usa la cuenta de servicio de la API; antes `esp32-8aa66`). `firebase/.firebaserc` ya lo fija.
 Plan Spark ⇒ sin Cloud Run: el dashboard desplegado en Hosting **lee Firestore directamente** (REST, solo lectura) y las escrituras
 las hace la API ejecutada en un PC con cuenta de servicio.
 Estado de la base: la creación de la base `(default)` se inició en la consola; **falta elegir la ubicación** (irreversible) y confirmar.
