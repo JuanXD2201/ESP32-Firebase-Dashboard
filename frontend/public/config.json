@@ -1,5 +1,5 @@
 {
-  "apiUrl": "",
+  "apiUrl": "http://localhost:8000",
   "firestoreProjectId": "esp32-980d5",
   "urlDespliegue": "https://esp32-980d5.web.app",
   "intervaloActualizacionS": 10
